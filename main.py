@@ -5,10 +5,11 @@ import time
 """----------------------结果统计----------------------"""
 
 
-def statistic(w, s_gate, xin, yin, nin, xout, yout, nout):
+def statistic(w, s_gate, xin, yin, xout, yout):
     wrong_cases_train = 0
     wrong_cases_test = 0
-
+    nin=len(xin)
+    nout=len(xout)
     for j in range(nin):
         if (np.dot(xin[j], w) - s_gate) * yin[j] <= 0:
             wrong_cases_train += 1
@@ -54,8 +55,8 @@ def fisher_discriminant(xin, yin):
     sw = s1 + s2
     sw_inverse = np.linalg.inv(sw)
     w = np.dot(sw_inverse, (u1 - u2).T)
-    s_gate = np.dot(u1 + u2, w) / 2
-    return w, s_gate
+
+    return w, u1+u2
 
 
 """----------------------数据集初始化----------------------"""
@@ -98,7 +99,8 @@ for i in range(n_test):
 """----------------------代码运行----------------------"""
 
 time_lg_start = time.time()
-w_fisher, gate = fisher_discriminant(x_train, y_train)
+w_fisher, mid = fisher_discriminant(x_train, y_train)
+gate = np.dot(mid, w_fisher) / 2
 time_lg_end = time.time()
 time_lg_spend = time_lg_end - time_lg_start
 
@@ -108,18 +110,21 @@ y_min = min(min(x1[:, 1]), min(x2[:, 1]))
 y_max = max(max(x1[:, 1]), max(x2[:, 1]))
 x_co = np.linspace(x_min - 1, x_max + 1)
 
-print("--------------广义逆结果统计--------------")
+print("--------------判别结果统计--------------")
 print("w=", w_fisher)
-statistic(w_fisher, gate, x_train, y_train, n_train, x_test, y_test, n_test)
+statistic(w_fisher, gate, x_train, y_train, x_test, y_test)
 print("算法运行时间=", time_lg_spend, "s")
 
 plt.figure("Fisher线性判别")
 str1 = "fisher, x1~N(%s,%s), x2~N(%s,%s)" % (mean1, var1, mean2, var2)
 plt.title(str1)
-z_pla = (w_fisher[1][0] / w_fisher[0][0]) * x_co
+z_fisher = (w_fisher[1][0] / w_fisher[0][0]) * x_co
+z_gate=-(w_fisher[0][0]/w_fisher[1][0])*(x_co-mid[0][0])+mid[0][1]
 plt.scatter(x1[:, 0], x1[:, 1], c='r')
 plt.scatter(x2[:, 0], x2[:, 1], c='b')
-plt.plot(x_co, z_pla, c='g')
+plt.plot(x_co, z_fisher, c='g')
+plt.plot(x_co,z_gate,c='y',linestyle='--')
+plt.axis("equal")
 plt.xlim(x_min - 1, x_max + 1)
 plt.ylim(y_min - 1, y_max + 1)
 
