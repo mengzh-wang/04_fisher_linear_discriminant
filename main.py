@@ -56,7 +56,7 @@ def fisher_discriminant(xin, yin):
     sw_inverse = np.linalg.inv(sw)
     w = np.dot(sw_inverse, (u1 - u2).T)
 
-    return w, u1+u2
+    return w, u1+u2/2
 
 
 """----------------------数据集初始化----------------------"""
@@ -100,7 +100,7 @@ for i in range(n_test):
 
 time_lg_start = time.time()
 w_fisher, mid = fisher_discriminant(x_train, y_train)
-gate = np.dot(mid, w_fisher) / 2
+gate = np.dot(mid, w_fisher)
 time_lg_end = time.time()
 time_lg_spend = time_lg_end - time_lg_start
 
