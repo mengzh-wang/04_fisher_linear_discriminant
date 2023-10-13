@@ -8,8 +8,8 @@ import time
 def statistic(w, s_gate, xin, yin, xout, yout):
     wrong_cases_train = 0
     wrong_cases_test = 0
-    nin=len(xin)
-    nout=len(xout)
+    nin = len(xin)
+    nout = len(xout)
     for j in range(nin):
         if (np.dot(xin[j], w) - s_gate) * yin[j] <= 0:
             wrong_cases_train += 1
@@ -56,7 +56,7 @@ def fisher_discriminant(xin, yin):
     sw_inverse = np.linalg.inv(sw)
     w = np.dot(sw_inverse, (u1 - u2).T)
 
-    return w, u1+u2/2
+    return w, (u1 + u2) / 2
 
 
 """----------------------数据集初始化----------------------"""
@@ -119,11 +119,13 @@ plt.figure("Fisher线性判别")
 str1 = "fisher, x1~N(%s,%s), x2~N(%s,%s)" % (mean1, var1, mean2, var2)
 plt.title(str1)
 z_fisher = (w_fisher[1][0] / w_fisher[0][0]) * x_co
-z_gate=-(w_fisher[0][0]/w_fisher[1][0])*(x_co-mid[0][0])+mid[0][1]
+z_gate = -(w_fisher[0][0] / w_fisher[1][0]) * (x_co - mid[0][0]) + mid[0][1]
 plt.scatter(x1[:, 0], x1[:, 1], c='r')
 plt.scatter(x2[:, 0], x2[:, 1], c='b')
-plt.plot(x_co, z_fisher, c='g')
-plt.plot(x_co,z_gate,c='y',linestyle='--')
+# plt.plot(x_co, z_fisher, c='g')
+# plt.plot(x_co,z_gate,c='y',linestyle='--')
+plt.axline((0, 0), slope=(w_fisher[1][0] / w_fisher[0][0]), c='g')
+plt.axline((mid[0][0], mid[0][1]), slope=-(w_fisher[0][0] / w_fisher[1][0]), c='y', linestyle='--')
 plt.axis("equal")
 plt.xlim(x_min - 1, x_max + 1)
 plt.ylim(y_min - 1, y_max + 1)
